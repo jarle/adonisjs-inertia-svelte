@@ -1,1 +1,0 @@
-# adonisjs-inertia-svelte
