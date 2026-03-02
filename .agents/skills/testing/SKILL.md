@@ -15,11 +15,12 @@ Docs: https://docs.adonisjs.com/guides/testing/introduction
 - New tests are created with the command `node ace make:test --suite=<functional|browser|unit>`
 - Tests are run with `LOG_LEVEL=info node ace test functional|browser|unit`
   - Run a specific group of test with `node ace test --groups=""`
+- Global database setup belongs in `tests/bootstrap.ts` via `testUtils.db().migrate()`
 - Create a new test user (and organization when needed) per test group via test helpers like `createTestActors` from `tests/utils/test_actors.ts`; do not reuse shared actors
 - Tests should have descriptive snake_case names that make it obvious what they test when looking at the test runner
 - Do not add console logs or any other explicit reporting when output is missing
 - If your service is dependent on other services, those can be instantiated for testing with `await app.container.make(ClassName)`
-- Tests that mutate db data should be wrapped in a global db transaction that is rolled back after running:
+- Tests that mutate db data should be reset between individual tests using `testUtils.db().withGlobalTransaction()`:
 
 ```ts
 test.group('User', (group) => {
@@ -27,7 +28,8 @@ test.group('User', (group) => {
 })
 ```
 
-- The global transaction will not work if you are using transactions in your tested code. In this case, you can use the testUtils.db().truncate() hook. This hook will truncate all your tables after each test.
+- If you are configuring standalone tests from `tests/bootstrap.ts`, use suite-level wiring that adds `test.setup(() => testUtils.db().withGlobalTransaction())` for each test in the suite.
+- The global transaction approach will not work if the code under test manages its own transactions. In that case, use `testUtils.db().truncate()` instead so tables are cleared after each test.
 
 ```ts
 import { test } from '@japa/runner'
@@ -119,17 +121,13 @@ test('registration sends welcome email', async ({ assert }) => {
 
 ### Isolation
 
-Always wrap database-mutating tests in transactions:
+Run migrations once globally, then wrap database-mutating tests in per-test transactions:
 
 ```typescript
-test.group('My service tests', (group) => {
-  group.each.setup(async () => {
-    await db.beginGlobalTransaction()
-    return () => db.rollbackGlobalTransaction()
-  })
-
-  // tests...
-})
+export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
+  setup: [() => testUtils.db().migrate()],
+  teardown: [],
+}
 ```
 
 ### SUT Uses DB Directly

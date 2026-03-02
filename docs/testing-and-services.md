@@ -36,8 +36,8 @@ It is part of the documented test contract for the repository.
 
 Local test services are managed through the package scripts in [`../package.json`](../package.json).
 
-- `services:test:up` starts the test dependency stack with `.env.test` and waits for healthy services.
-- `services:test:down` stops the same stack.
+- `services:test:up` first tears down any previous test stack, then starts the test dependency stack with `.env.test` and waits for healthy services.
+- `services:test:down` stops the same stack and removes its volumes and orphaned containers.
 - `test` runs the Adonis test suite without starting Docker automatically.
 
 This separation keeps the local test command compatible with other environments, including GitHub Actions.
@@ -48,8 +48,8 @@ The intended local workflow is:
 - Run the needed test command, including the `browser` suite when working on frontend behavior.
 - Stop the test stack with `services:test:down` when finished.
 
-If the test ports are already in use, stop the previous test stack before starting it again.
-That refers to the test stack, not the normal development stack.
+The test service commands are safe to rerun because they clean the previous test stack first.
+If a test port is still reported as busy after that, the issue is stale local Docker state rather than the project configuration.
 
 ## GitHub Workflow
 

@@ -13,6 +13,7 @@ See [resources](resources/japa-browser-client.md) for more detailed Japa documen
 - `node ace test browser` runs the suite; limit files with `--files tests/browser/smoketest.spec.ts`.
 - Control Playwright timeout with `BROWSER_TIMEOUT` (ms); defaults to 40000.
 - Keep timeout config out of test files; rely on env/runner defaults.
+- Browser tests depend on the shared test bootstrap. Keep schema setup in `tests/bootstrap.ts` via `testUtils.db().migrate()` and reset DB state per test with `testUtils.db().withGlobalTransaction()`.
 
 ## Debug aids
 
@@ -50,6 +51,6 @@ test('visit home page', async ({ visit }) => {
 - For auth/redirect flows, drive the real route:
   - Swap external components with fakes via `app.container.swap` (e.g., fake MSAL that returns a callback URL).
   - Trigger the redirect endpoint, wait for the callback URL, then land back on the target page and assert UI state.
-- Keep data isolation: `group.each.setup(() => testUtils.db().withGlobalTransaction())` and clear relevant tables before each case.
+- Keep data isolation: migrate once in `tests/bootstrap.ts`, then reset each browser test with `testUtils.db().withGlobalTransaction()`. If suite wiring happens in `tests/bootstrap.ts`, attach the transaction hook per test via `suite.onTest((test) => test.setup(() => testUtils.db().withGlobalTransaction()))`.
 - Seed state via models/services (e.g., insert connections or enquiries) instead of mocking fetch.
 - When waiting on state changes, combine the action with an awaited navigation/response, or wait for specific testids to detach/appear; avoid arbitrary long timeouts.

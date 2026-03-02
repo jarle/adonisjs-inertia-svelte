@@ -1,5 +1,4 @@
 import { authBrowserClient } from '@adonisjs/auth/plugins/browser_client'
-import ace from '@adonisjs/core/services/ace'
 import { assert } from '@japa/assert'
 import app from '@adonisjs/core/services/app'
 import server from '@adonisjs/core/services/server'
@@ -37,8 +36,8 @@ export const plugins: Config['plugins'] = [
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [
+    () => testUtils.db().migrate(),
     async () => {
-      await ace.exec('migration:run', ['--disable-locks'])
       await fs.rm('tmp/browser', { recursive: true, force: true })
     },
   ],
@@ -63,6 +62,8 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
   }
 
   if (suite.name === 'browser') {
-    suite.setup(() => testUtils.db().withGlobalTransaction())
+    suite.onTest((test) => {
+      test.setup(() => testUtils.db().withGlobalTransaction())
+    })
   }
 }
