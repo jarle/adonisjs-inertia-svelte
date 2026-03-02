@@ -17,8 +17,8 @@
   "include": [
     "./**/*.ts",
     "./**/*.d.ts",
+    "./**/*.svelte",
     "../.adonisjs/client/**/*.ts",
-    "../.adonisjs/server/**/*.ts",
-    "app.ts"
+    "../.adonisjs/server/**/*.ts"
   ]
 }

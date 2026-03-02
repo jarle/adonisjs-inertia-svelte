@@ -1,4 +1,4 @@
-import { registry } from '@generated/registry'
+import { registry } from '../.adonisjs/client/registry/index.js'
 import { createTuyau } from '@tuyau/core/client'
 
 export const client = createTuyau({

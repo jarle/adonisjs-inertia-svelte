@@ -4,5 +4,6 @@
     "rootDir": "./",
     "outDir": "./build"
   },
+  "include": ["./**/*.ts", "./**/*.d.ts", ".adonisjs/client/**/*.ts", ".adonisjs/server/**/*.ts"],
   "exclude": ["build", "node_modules", "prior-art"]
 }
