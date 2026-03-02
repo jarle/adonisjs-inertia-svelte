@@ -1,6 +1,6 @@
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/svelte'
 import { mount } from 'svelte'
-import './css/app.css'
+import './styles/index.css'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 
