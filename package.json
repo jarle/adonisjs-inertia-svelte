@@ -11,6 +11,10 @@
     "start": "node bin/server.js",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
+    "services:up": "docker-compose up -d",
+    "services:down": "docker-compose down",
+    "services:test:up": "docker-compose --env-file .env.test up -d",
+    "services:test:down": "docker-compose --env-file .env.test down",
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -73,6 +77,7 @@
     "better-sqlite3": "^12.6.2",
     "edge.js": "^6.5.0",
     "luxon": "^3.7.2",
+    "pg": "^8.19.0",
     "reflect-metadata": "^0.2.2",
     "svelte": "^5.53.6"
   },

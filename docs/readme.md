@@ -6,3 +6,4 @@ These documents describe the intent and overall flow of the system.
 ## Documents
 
 - [Styling system](./styling.md)
+- [Testing and services](./testing-and-services.md)
