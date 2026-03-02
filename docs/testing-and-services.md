@@ -26,7 +26,8 @@ This makes the local setup predictable while still allowing the test environment
 Adonis loads this file automatically for test runs.
 
 The test environment exists to isolate local tests from the normal development environment.
-It uses different host ports so a developer can keep the regular application stack running while bringing up the test stack separately.
+It uses a fixed set of non-default host ports so a developer can keep the regular application stack running while bringing up the test stack separately.
+It also uses a separate Compose project name, so the test stack gets its own containers, network, and volumes instead of reusing development state.
 
 This file is committed because it describes shared project behavior rather than machine-specific secrets.
 It is part of the documented test contract for the repository.
@@ -35,11 +36,20 @@ It is part of the documented test contract for the repository.
 
 Local test services are managed through the package scripts in [`../package.json`](../package.json).
 
-- `services:test:up` starts the test dependency stack with `.env.test`.
+- `services:test:up` starts the test dependency stack with `.env.test` and waits for healthy services.
 - `services:test:down` stops the same stack.
 - `test` runs the Adonis test suite without starting Docker automatically.
 
 This separation keeps the local test command compatible with other environments, including GitHub Actions.
+
+The intended local workflow is:
+
+- Start the test stack with `services:test:up`.
+- Run the needed test command, including the `browser` suite when working on frontend behavior.
+- Stop the test stack with `services:test:down` when finished.
+
+If the test ports are already in use, stop the previous test stack before starting it again.
+That refers to the test stack, not the normal development stack.
 
 ## GitHub Workflow
 
